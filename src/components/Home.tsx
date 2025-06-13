@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import {
     Button,
     Center,
@@ -7,61 +7,106 @@ import {
     Icon,
     Input,
     ScaleFade,
-    OrderedList,
     Divider,
-    ListItem,
     Spinner,
     InputGroup, // Some Chakra components that might be usefull
     HStack,
     VStack,
     InputRightAddon,
+    Box,
+    ListItem,
+    UnorderedList,
+    OrderedList,
 } from "@chakra-ui/react"
+import { List } from "@chakra-ui/react"
 import { Card } from '@components/design/Card'
 import { searchSchoolDistricts, searchSchools, NCESDistrictFeatureAttributes, NCESSchoolFeatureAttributes } from "@utils/nces"
 
 
 const Home: React.FC = () => {
-    const [searching, setSearching] = React.useState(false)
-    const [districtSearch, setDistrictSearch] = React.useState<NCESDistrictFeatureAttributes[]>([]);
-    const [schoolSearch, setSchoolSearch] = React.useState<NCESSchoolFeatureAttributes[]>([]);
-    
-    const demo = async () => { // see console for api result examples
-        setSearching(true)
-        const demoDistrictSearch = await searchSchoolDistricts("Peninsula School District")
-        setDistrictSearch(demoDistrictSearch)
-        console.log("District example", demoDistrictSearch)
 
-        const demoSchoolSearch = await searchSchools("k", demoDistrictSearch[1].LEAID)
-        setSchoolSearch(demoSchoolSearch)
-        console.log("School Example", demoSchoolSearch)
-        setSearching(false)
-    }
+    const [districtQuery, setDistrictQuery] = useState<string>("");
+
+    const [districts, setDistricts] = useState<NCESDistrictFeatureAttributes[]>([]);
+    const [loadingDistricts, setLoadingDistricts] = useState<boolean>(false);
+    const [districtError, setDistrictError] = useState<string | null>(null);
+
+    const [schoolSearch, setSchoolSearch] = React.useState<NCESSchoolFeatureAttributes[]>([]);
+    const [searching, setSearching] = React.useState(false)
 
     useEffect(() => {
-        demo()
-    }, [])
+        // Clear results if query is empty
+        if (!districtQuery) {
+            setDistricts([]);
+            setDistrictError(null);
+            setLoadingDistricts(false);
+            return;
+        }
+
+        let canceled = false;
+        setLoadingDistricts(true);
+        setDistrictError(null);
+
+        const loadDistricts = async () => {
+            try {
+                const results = await searchSchoolDistricts(districtQuery);
+                if (!canceled) {
+                    setDistricts(results);
+                }
+            } catch (err: any) {
+                if (!canceled) {
+                    setDistrictError(err.message || "Failed to load districts");
+                }
+            } finally {
+                if (!canceled) {
+                    setLoadingDistricts(false);
+                }
+            }
+        };
+
+        loadDistricts();
+
+        // Cleanup if query changes mid-request
+        return () => {
+            canceled = true;
+        };
+    }, [districtQuery]);
     
     return (
         <Center padding="100px" height="90vh">
             <ScaleFade initialScale={0.9} in={true}>
                 <Card variant="rounded" borderColor="blue">
                     <Heading>School Data Finder</Heading>
-                    <Text>
-                        How would you utilize React.useEffect with the searchSchoolDistricts and searchSchools functions? <br />
-                        Using <a href="https://chakra-ui.com/docs/principles" target="_blank">Chakra-UI</a> or your favorite UI toolkit, build an interface that allows the user to: <br />
-                        <OrderedList>
-                            <ListItem>Search for a district</ListItem>
-                            <ListItem>Search for a school within the district (or bypass district filter)</ListItem>
-                            <ListItem>View all returned data in an organized way</ListItem>
-                        </OrderedList>
-                    </Text>
+
                     <Divider margin={4} />
-                    <Text>
-                        Check the console for example of returned data. <b>Happy coding!</b>< br />
-                        {searching ? <Spinner /> : <></>}< br />
-                        {districtSearch.length} Demo Districts<br />
-                        {schoolSearch.length} Demo Schools<br />
-                    </Text>
+
+                    <Heading size="md">District Search</Heading>
+                    <Input
+                        placeholder="Search for a district…"
+                        value={districtQuery}
+                        onChange={(e) => setDistrictQuery(e.target.value)}
+                        mb={4}
+                        />
+
+                        {loadingDistricts && <Spinner mb={2} />}
+
+                        {districtError && (
+                        <Text color="red.500" mb={2}>
+                            {districtError}
+                        </Text>
+                        )}
+
+                        <Box maxH="300px" overflowY="auto" mb={4}>
+                            <UnorderedList spacing={2}>
+                                {districts.map((d) => (
+                                <ListItem key={d.LEAID}>
+                                    {d.NAME}
+                                </ListItem>
+                                ))}
+                            </UnorderedList>
+                        </Box>
+
+                    <Divider margin={4} />
                 </Card>
             </ScaleFade>
         </Center>
