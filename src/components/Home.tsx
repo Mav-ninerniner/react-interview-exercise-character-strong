@@ -9,14 +9,9 @@ import {
     ScaleFade,
     Divider,
     Spinner,
-    InputGroup, // Some Chakra components that might be usefull
-    HStack,
-    VStack,
-    InputRightAddon,
     Box,
     ListItem,
     UnorderedList,
-    Stack,
 } from "@chakra-ui/react"
 import { Card } from '@components/design/Card'
 import { searchSchoolDistricts, searchSchools, NCESDistrictFeatureAttributes, NCESSchoolFeatureAttributes } from "@utils/nces"
@@ -39,7 +34,7 @@ const Home: React.FC = () => {
     // Fetch Districts
     useEffect(() => {
         // Clear results if query is empty
-        if (!districtQuery) {
+        if (!districtQuery || districtQuery.length<3) {
             setDistricts([]);
             setDistrictError(null);
             setLoadingDistricts(false);
@@ -104,9 +99,9 @@ const Home: React.FC = () => {
     };
     
     return (
-        <Center padding="100px" minH="90vh" overflowY="auto">
+        <Center padding="100px" minH="90vh" overflowY="auto" width="">
             <ScaleFade initialScale={0.9} in={true}>
-                <Card variant="rounded" borderColor="blue">
+                <Card variant="rounded" borderColor="teal">
                     <Heading>School Data Finder</Heading>
 
                     <Divider margin={4} />
@@ -114,7 +109,7 @@ const Home: React.FC = () => {
                     <Heading size="md">District Search</Heading>
                     
                     <Input
-                        placeholder="Search for a school district …"
+                        placeholder="Search for a school district…"
                         value={districtQuery}
                         onChange={(e) => setDistrictQuery(e.target.value)}
                         mb={4}
@@ -128,7 +123,7 @@ const Home: React.FC = () => {
                         </Text>
                         )}
 
-                        <Box maxH="300px" overflowY="auto" mb={4}>
+                        <Box maxH="300px" overflowY="auto" mb={4} pl={4}>
                             <UnorderedList spacing={2}>
                                 {districts.map((d: NCESDistrictFeatureAttributes) => (
                                 <ListItem 
