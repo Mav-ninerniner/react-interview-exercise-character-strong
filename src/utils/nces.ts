@@ -1,4 +1,5 @@
 export interface NCESSchoolFeatureAttributes {
+    SCHOOLYEAR?: string,
     NCESSCH?: string,
     LEAID?: string,
     NAME?: string,
@@ -84,6 +85,7 @@ const searchSchools = async (name:string, district?:string):Promise<NCESSchoolFe
     let combinedData = [];
     let privateResponse = await (await fetch(privateSchoolEndpoint)).json();
     let publicResponse = await (await fetch(publicSchoolEndpoint)).json();
+    console.log(publicResponse.features[0]);
     
     combinedData = [
         ...privateResponse.features ? privateResponse.features.map((feature:NCESSchoolFeature) => {return feature.attributes }) : [],
