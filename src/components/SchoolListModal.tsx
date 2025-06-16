@@ -16,6 +16,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { SchoolListModalProps } from "@utils/nces";
+import SchoolMap from "@components/SchoolMap";
 
 interface DetailItemProps {
   label: string;
@@ -143,7 +144,13 @@ const SchoolListModal: React.FC<SchoolListModalProps> = ({
                       ))
                     }
                   </SimpleGrid>
+                  {/* <SchoolMap schools={schools} /> */}
+                  <SchoolMap
+                    lat={selectedSchool.LAT as number}
+                    lng={selectedSchool.LON as number}
+                  />
                 </Box>
+                
               )}
             </VStack>
           )}
