@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -10,25 +10,24 @@ import {
   Spinner,
   Text,
   VStack,
-  Select,
   SimpleGrid,
+  UnorderedList,
+  ListItem,
+  Input,
 } from "@chakra-ui/react";
 import { SchoolListModalProps } from "@utils/nces";
 
-
 interface DetailItemProps {
-  label: React.ReactNode;
-  value: string | number | undefined;
+  label: string;
+  value?: string | number;
 }
-
 const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
-  if (value == null) return null;
+  if (value == null) 
+    return null;
   return (
     <>
-      <Text fontWeight="bold">
-        {React.Children.toArray(label)}:
-      </Text>
-      <Text>{value.toString()}</Text>
+      <Text fontWeight="bold">{label}:</Text>
+      <Text>{value}</Text>
     </>
   );
 };
@@ -42,26 +41,33 @@ const SchoolListModal: React.FC<SchoolListModalProps> = ({
   error,
 }) => {
   const [selectedId, setSelectedId] = useState<string>("");
+  const [filterQuery, setFilterQuery] = useState<string>("");
 
-  const selectedSchool = schools.find((s) => s.NCESSCH === selectedId);
+  const selectedSchool = schools.find((s) => String(s.NCESSCH) === selectedId);
 
-  // Build an array of [label, value] for mapping
+  // filter schools by Name
+  const filteredSchools = useMemo(() =>
+      schools.filter((s) =>
+        s.NAME?.toLowerCase().includes(filterQuery.toLowerCase())
+      ), [schools, filterQuery]
+  );
+
+   useEffect(() => {
+    if (isOpen) {
+      setFilterQuery("");
+      setSelectedId("");
+    }
+  }, [isOpen, districtName]);
+
   const details: [string, string | number | undefined][] = selectedSchool
     ? [
-        ["NCESSCH", selectedSchool.NCESSCH],
-        ["LEAID", selectedSchool.LEAID],
-        ["Name", selectedSchool.NAME],
-        ["OPSTFIPS", selectedSchool.OPSTFIPS],
-        ["Street", selectedSchool.STREET],
-        ["City", selectedSchool.CITY],
-        ["State", selectedSchool.STATE],
-        ["ZIP", selectedSchool.ZIP],
-        ["STFIP", selectedSchool.STFIP],
-        ["CNTY", selectedSchool.CNTY],
-        ["NMCNTY", selectedSchool.NMCNTY],
-        ["Locale", selectedSchool.LOCALE],
-        ["Latitude", selectedSchool.LAT],
-        ["Longitude", selectedSchool.LON],
+        ["Name of institution", selectedSchool.NAME],
+        ["School year", selectedSchool.SCHOOLYEAR],
+        ["Location Street", selectedSchool.STREET],
+        ["Location City", selectedSchool.CITY],
+        ["Location State", selectedSchool.STATE],
+        ["Location ZIP", selectedSchool.ZIP],
+        ["County Name", selectedSchool.NMCNTY],
       ]
     : [];
 
@@ -78,29 +84,64 @@ const SchoolListModal: React.FC<SchoolListModalProps> = ({
               {error}
             </Text>
           )}
-
           {!loading && !error && (
             <VStack spacing={4} align="stretch">
-              {/* Dropdown */}
-              <Select
-                placeholder="Select a school…"
-                value={selectedId}
-                onChange={(e) => setSelectedId(e.target.value)}
-              >
-                {schools.map((s) => (
-                  <option key={s.NCESSCH} value={String(s.NCESSCH)}>
-                    {s.NAME}
-                  </option>
-                ))}
-              </Select>
+              {/* 1) In-modal search box */}
+              <Input
+                placeholder="Filter schools…"
+                value={filterQuery}
+                onChange={(e) => setFilterQuery(e.target.value)}
+              />
 
-              {/* Details Grid */}
+              {/* 2) School List */}
+              <Box maxH="300px" overflowY="auto" mb={4} pl={4}>
+                <UnorderedList spacing={2}>
+                  {filteredSchools.map((s) => (
+                    <ListItem
+                      key={s.NCESSCH}
+                      cursor="pointer"
+                      px={3}
+                      py={2}
+                      borderRadius="md"
+                      bg={
+                        selectedId === String(s.NCESSCH)
+                          ? "teal.100"
+                          : "transparent"
+                      }
+                      _hover={{ bg: "teal.50" }}
+                      transition="background-color 0.2s"
+                      onClick={() => setSelectedId(String(s.NCESSCH))}
+                    >
+                      {s.NAME}
+                    </ListItem>
+                  ))}
+                  {filteredSchools.length === 0 && (
+                    <Text textAlign="center" color="gray.500">
+                      No schools match “{filterQuery}”
+                    </Text>
+                  )}
+                </UnorderedList>
+              </Box>
+
+              {/* 3) Details Grid */}
               {selectedSchool && (
-                <Box p={4} borderWidth="1px" borderRadius="md" boxShadow="sm" maxH="600px" overflowY="auto" overflowX="hidden" w="100%" pr={4}>
+                <Box
+                  p={4}
+                  borderWidth="1px"
+                  borderRadius="md"
+                  boxShadow="sm"
+                  maxH="600px"
+                  overflowY="auto"
+                  overflowX="hidden"
+                  w="100%"
+                  pr={4}
+                >
                   <SimpleGrid columns={2} spacing={3}>
-                    {details.map(([label, value]) => (
-                      <DetailItem key={label} label={label} value={value} />
-                    ))}
+                    {
+                      details.map(([label, value]) => (
+                        <DetailItem key={label} label={label} value={value} />
+                      ))
+                    }
                   </SimpleGrid>
                 </Box>
               )}
@@ -113,3 +154,4 @@ const SchoolListModal: React.FC<SchoolListModalProps> = ({
 };
 
 export default SchoolListModal;
+

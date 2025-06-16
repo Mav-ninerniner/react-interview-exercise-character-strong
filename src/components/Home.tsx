@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react"
 import {
-    Button,
     Center,
     Heading,
     Text,
-    Icon,
     Input,
     ScaleFade,
     Divider,
@@ -34,7 +32,7 @@ const Home: React.FC = () => {
     // Fetch Districts
     useEffect(() => {
         // Clear results if query is empty
-        if (!districtQuery || districtQuery.length<3) {
+        if (districtQuery.length<3) {
             setDistricts([]);
             setDistrictError(null);
             setLoadingDistricts(false);
@@ -103,12 +101,10 @@ const Home: React.FC = () => {
             <ScaleFade initialScale={0.9} in={true}>
                 <Card variant="rounded" borderColor="teal">
                     <Heading>School Data Finder</Heading>
-
                     <Divider margin={4} />
-
                     <Heading size="md">District Search</Heading>
-                    
                     <Input
+                        name="school-district"
                         placeholder="Search for a school district…"
                         value={districtQuery}
                         onChange={(e) => setDistrictQuery(e.target.value)}
@@ -125,16 +121,24 @@ const Home: React.FC = () => {
 
                         <Box maxH="300px" overflowY="auto" mb={4} pl={4}>
                             <UnorderedList spacing={2}>
-                                {districts.map((d: NCESDistrictFeatureAttributes) => (
+                                {districts ? districts.map((d: NCESDistrictFeatureAttributes) => (
                                 <ListItem 
                                     key={d.LEAID}
                                     cursor="pointer"
+                                    px={3}
+                                    py={2}
+                                    borderRadius="md"
                                     fontWeight={selectedDistrict?.LEAID === d.LEAID ? "bold" : "normal"}
+                                    _hover={{
+                                     bg: "teal.50",
+                                      color: "teal.700",
+                                    }}
+                                    transition="background-color 0.2s, color 0.2s"
                                     onClick={() => handleDistrictClick(d)}
                                 >
                                     {d.NAME}
                                 </ListItem>
-                                ))}
+                                )) : <></>}
                             </UnorderedList>
                         </Box>
                         
