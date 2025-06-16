@@ -55,3 +55,8 @@ The goal of this exercise is to build a prototype utility that gives users abili
 ## What Happens Next?
 
 CharacterStrong tech team members will review your repo, share the built interface with interested colleagues, and reach out to you so we can review your submission and ask questions.
+
+## Live
+
+You can check the website live at:
+https://mav-ninerniner.github.io/react-interview-exercise-character-strong/
