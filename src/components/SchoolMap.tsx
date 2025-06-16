@@ -1,8 +1,5 @@
-import React from "react";
 import { Box, Spinner, Text } from "@chakra-ui/react";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
-
-const containerStyle = { width: "100%", height: "250px" };
 
 export default function SchoolMap({lat, lng}: {lat: number; lng: number; }) {
   const rawKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
@@ -25,7 +22,7 @@ export default function SchoolMap({lat, lng}: {lat: number; lng: number; }) {
   return (
     <Box border="1px solid" borderColor="gray.200" borderRadius="md" overflow="hidden">
       <GoogleMap
-        mapContainerStyle={containerStyle}
+        mapContainerStyle={{ width: "100%", height: "250px" }}
         zoom={15}
         center={center}
       >
