@@ -58,6 +58,15 @@ interface NCESDistrictFeature {
     }
 }
 
+export interface SchoolListModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  districtName: string;
+  schools: NCESSchoolFeatureAttributes[];
+  loading: boolean;
+  error: string | null;
+}
+
 const searchSchoolDistricts = async (name:string):Promise<NCESDistrictFeatureAttributes[]> => {
     let publicSchoolEndpoint = `https://nces.ed.gov/opengis/rest/services/K12_School_Locations/EDGE_GEOCODE_PUBLICLEA_1516/MapServer/0/query?where=UPPER(NAME) LIKE UPPER('%${name}%')&outFields=*&outSR=4326&f=json`;
     let combinedData = [];
