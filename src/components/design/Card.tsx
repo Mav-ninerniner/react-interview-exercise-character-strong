@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import { Box, useStyleConfig } from "@chakra-ui/react"
 
 export const CardTheme = {
@@ -29,7 +29,7 @@ export const CardTheme = {
     },
 }
 
-export const Card:React.FC<{variant:string, borderColor?:string}>  = ({variant, children, borderColor, ...rest}) => {
+export const Card:React.FC<PropsWithChildren<{variant:string, borderColor?:string}>>  = ({variant, children, borderColor, ...rest}) => {
   const styles = useStyleConfig("Card", { variant })
   // Pass the computed styles into the `__css` prop
   return (

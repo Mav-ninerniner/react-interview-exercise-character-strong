@@ -1,4 +1,4 @@
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import {theme} from '@theme/index';
 import './Glob.scss';
 
@@ -8,7 +8,7 @@ import './Glob.scss';
  * @returns An interactive globby thing
  */
 
-const Glob: React.FC<{
+const Glob: React.FC<PropsWithChildren<{
     color?:string, 
     size?:string[], //Width / Height 
     globSizes?:number[][],
@@ -21,7 +21,7 @@ const Glob: React.FC<{
     speed?:number,
     radius?:string,
     rotate?:number
-}> = ({
+}>> = ({
     children, 
     color=theme.colors.brand.blue,
     size=["50%", "50%"], 

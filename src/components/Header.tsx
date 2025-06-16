@@ -5,7 +5,7 @@ import Glob from "./design/Glob";
 import {theme} from '@theme/index';
 
 
-const Header: React.FC = ({children}) => {
+const Header: React.FC<React.PropsWithChildren<{}>> = ({children}) => {
 
     return (
         <>
