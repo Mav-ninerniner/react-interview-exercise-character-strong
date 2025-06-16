@@ -5,6 +5,7 @@ export default function SchoolMap({lat, lng}: {lat: number; lng: number; }) {
   const rawKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
 
   if (typeof rawKey !== "string" || rawKey === "") {
+    // @ts-ignore TS2590: Chakra’s Text children type is too big for TS to infer here
     return <Text color="red.500">Missing Google Maps API key</Text>;
   }
 
